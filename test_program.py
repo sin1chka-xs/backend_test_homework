@@ -1,20 +1,38 @@
-import os
+TEST_DATA: list[int, tuple, bool] = [
+    (44, 'success', True),
+    (16, 'failure', True),
+    (4, 'success', False),
+    (21, 'failure', False),
+]
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-dir_files = [filename.lower() for filename in os.listdir(BASE_DIR)]
-
-files_list = ['program.py', 'readme.md']
+BONUS: float = 1.1
+ANTIBONUS: float = 0.8
 
 
-def test_program():
-    for filename in files_list:
-        assert filename in dir_files, f'Файл `{filename}` не найден в корне репозитория'
+def add_rep(current_rep, rep_points, buf_effect):
+    current_rep += rep_points
+    if buf_effect:
+        return current_rep * BONUS
+    return current_rep
 
-    try:
-        import program
-    except Exception as e:
-        assert False, (
-            'Не удалось запустить `program.py`. '
-            'Исправьте в нем ошибки:\n'
-            f'{e}'
-        )
+
+def remove_rep(current_rep, rep_points, debuf_effect):
+    current_rep -= rep_points
+    if debuf_effect:
+        return current_rep * ANTIBONUS
+    return current_rep
+
+
+def main(duel_res):
+    current_rep = 0.0
+    for rep, result, effect in duel_res:
+        if result == 'success':
+            current_rep = add_rep(current_rep, rep, effect)
+        if result == 'failure':
+            current_rep = remove_rep(current_rep, rep, effect)
+    return (f'После {len(duel_res)} поединков, '
+            f'репутация персонажа — {current_rep:.3f} очков.')
+
+
+# Тестовый вызов функции main.
+print(main(TEST_DATA))
